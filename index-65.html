@@ -1,0 +1,2167 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindarin.ai | ИИ перевод лекций</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.10.1/lottie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+
+    <style>
+        /* ================= VARIABLES ================= */
+        :root {
+            --primary-bg: #0a0f3b;
+            --secondary-bg: #110c3a;
+            --accent-pink: #ff4b8c;
+            --accent-purple: #8c4bff;
+            --accent-cyan: #4bffb8;
+            --chinese-red: #DE2910;
+            --chinese-gold: #FFDE00;
+            --text-main: #ffffff;
+            --text-muted: #cfcfff;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --font-main: 'Inter', sans-serif;
+            --font-chinese: 'Noto Serif SC', serif;
+        }
+
+        /* ================= RESET & BASE ================= */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: var(--font-main);
+            background: linear-gradient(135deg, var(--primary-bg), var(--secondary-bg));
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        img { max-width: 100%; display: block; }
+
+        /* ================= UTILITY ================= */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ================= LANGUAGE SWITCHER ================= */
+        .lang-switch {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--chinese-gold);
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: var(--chinese-gold);
+            cursor: pointer;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+            font-family: var(--font-main);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .lang-switch:hover {
+            background: var(--chinese-gold);
+            color: #000;
+        }
+
+        /* ================= SCROLL TO TOP ================= */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--chinese-red);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+            z-index: 999;
+            box-shadow: 0 0 20px rgba(222, 41, 16, 0.5);
+        }
+        .scroll-top.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        /* ================= COOKIE BANNER ================= */
+        .cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 1px solid var(--chinese-gold);
+            padding: 20px;
+            z-index: 10001;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            transform: translateY(100%);
+            transition: transform 0.5s ease;
+        }
+        .cookie-banner.show { transform: translateY(0); }
+        .cookie-banner p { color: var(--text-muted); font-size: 0.9rem; }
+        .cookie-btn {
+            background: var(--chinese-gold);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            flex-shrink: 0;
+        }
+        .cookie-btn:hover { background: white; }
+
+        /* ================= DECORATIVE PATTERNS ================= */
+        section::before, section::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0 L50 0 L50 10 L10 10 L10 50 L0 50 Z' fill='%23FFDE00' fill-opacity='0.2'/%3E%3Cpath d='M100 100 L50 100 L50 90 L90 90 L90 50 L100 50 Z' fill='%23FFDE00' fill-opacity='0.2'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+        }
+        section::before { top: 0; left: 0; }
+        section::after { bottom: 0; right: 0; transform: rotate(180deg); }
+
+        /* ================= PARTICLES BACKGROUND ================= */
+        #particles-js {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* ================= FLOATING LANTERNS ================= */
+        .lantern {
+            position: fixed;
+            width: 20px;
+            height: 30px;
+            background: linear-gradient(to bottom, rgba(222, 41, 16, 0.6), rgba(255, 222, 0, 0.8));
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255, 100, 0, 0.6);
+            z-index: 1;
+            pointer-events: none;
+            animation: floatLantern linear infinite;
+        }
+        .lantern::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 10px;
+            background: rgba(255, 222, 0, 0.5);
+        }
+
+        @keyframes floatLantern {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* ================= SECTIONS ANIMATION ================= */
+        section {
+            padding: 100px 20px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            position: relative;
+            z-index: 2;
+            border: 1px solid transparent;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+            border: 1px solid rgba(255, 222, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            background: linear-gradient(90deg, var(--chinese-red), var(--chinese-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        h2::after {
+            content: '☯';
+            display: block;
+            font-size: 1rem;
+            text-align: center;
+            margin-top: 10px;
+            background: none;
+            -webkit-text-fill-color: var(--chinese-gold);
+            opacity: 0.7;
+        }
+
+        /* ================= HERO ================= */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-top: 0;
+            opacity: 1; 
+            transform: none;
+            overflow: hidden;
+        }
+        
+        .hero-bg-char {
+            position: absolute;
+            font-family: var(--font-chinese);
+            font-size: 40vw;
+            color: rgba(255, 255, 255, 0.03);
+            z-index: 0;
+            pointer-events: none;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            user-select: none;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .brand {
+            display: block;
+            font-size: 1.5rem;
+            margin-top: 10px;
+            background: linear-gradient(90deg, var(--chinese-red), var(--chinese-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: brandGlow 3s infinite alternate;
+        }
+
+        @keyframes brandGlow {
+            0% { filter: drop-shadow(0 0 5px var(--chinese-red)); }
+            100% { filter: drop-shadow(0 0 20px var(--chinese-gold)); }
+        }
+
+        .hero-description {
+            font-size: 1.25rem;
+            max-width: 800px;
+            width: 100%;
+            color: var(--text-muted);
+            margin: 0 auto 40px;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .typewriter-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background-color: var(--chinese-gold);
+            margin-left: 2px;
+            animation: blink 1s infinite;
+            vertical-align: text-bottom;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .chinese-seal {
+            position: absolute;
+            top: 20%;
+            right: 10%;
+            width: 80px;
+            height: 80px;
+            border: 3px solid var(--chinese-red);
+            color: var(--chinese-red);
+            font-family: var(--font-chinese);
+            font-size: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+            opacity: 0.6;
+            transform: rotate(15deg);
+            box-shadow: 0 0 20px rgba(222, 41, 16, 0.3);
+            animation: sealPulse 4s infinite;
+        }
+        
+        @keyframes sealPulse {
+            0% { opacity: 0.6; transform: rotate(15deg) scale(1); }
+            50% { opacity: 0.9; transform: rotate(15deg) scale(1.05); }
+            100% { opacity: 0.6; transform: rotate(15deg) scale(1); }
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--chinese-red), var(--accent-pink));
+            box-shadow: 0 5px 20px rgba(222, 41, 16, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(222, 41, 16, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--chinese-gold);
+            backdrop-filter: blur(5px);
+            color: var(--chinese-gold);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 222, 0, 0.1);
+            box-shadow: 0 0 20px rgba(255, 222, 0, 0.2);
+        }
+
+        /* QR CODES */
+        .qr-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .qr-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            transition: 0.4s;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .qr-item:hover {
+            transform: translateY(-10px) scale(1.05);
+            border-color: var(--chinese-gold);
+            box-shadow: 0 0 25px rgba(255, 222, 0, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .qr-item img {
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+        }
+        
+        .qr-label {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--chinese-gold);
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* ================= FEATURES ================= */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 35px;
+            transition: 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '龙';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-family: var(--font-chinese);
+            font-size: 5rem;
+            color: rgba(255, 222, 0, 0.05);
+            transition: 0.5s;
+        }
+        
+        .card:hover::before {
+            color: rgba(255, 222, 0, 0.15);
+            transform: rotate(10deg);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--chinese-gold);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--chinese-gold);
+        }
+
+        /* ================= GLOSSARY SECTION ================= */
+        .glossary-section {
+            padding: 100px 20px;
+            background: linear-gradient(180deg, rgba(10, 15, 59, 0.9), rgba(17, 12, 58, 0.95));
+        }
+
+        .glossary-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .glossary-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .glossary-header p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .glossary-search {
+            max-width: 500px;
+            margin: 30px auto;
+            position: relative;
+        }
+        .glossary-search input {
+            width: 100%;
+            padding: 15px 25px;
+            border-radius: 30px;
+            border: 1px solid var(--chinese-gold);
+            background: rgba(0,0,0,0.3);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+        .glossary-search input:focus {
+            box-shadow: 0 0 20px rgba(255, 222, 0, 0.2);
+            background: rgba(0,0,0,0.5);
+        }
+
+        .glossary-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+        }
+        
+        .tab-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: var(--font-main);
+            font-size: 0.9rem;
+        }
+        
+        .tab-btn:hover, .tab-btn.active {
+            background: var(--chinese-gold);
+            color: #000;
+            border-color: var(--chinese-gold);
+            transform: translateY(-2px);
+        }
+
+        /* MOBILE SELECT DROPDOWN */
+        .glossary-select-mobile {
+            display: none; 
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid var(--chinese-gold);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .glossary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .glossary-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 100px;
+            transition: 0.3s;
+        }
+
+        .glossary-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-purple);
+            transform: translateY(-3px);
+        }
+
+        .glossary-term {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .glossary-translation {
+            font-family: var(--font-chinese);
+            font-size: 1.2rem;
+            color: var(--chinese-gold);
+            letter-spacing: 1px;
+        }
+
+        .no-results {
+            text-align: center;
+            color: var(--text-muted);
+            grid-column: 1 / -1;
+            padding: 40px;
+        }
+
+        /* ================= STATS SECTION ================= */
+        .stats-section {
+            background: linear-gradient(135deg, rgba(222, 41, 16, 0.1), rgba(255, 222, 0, 0.1));
+            border-top: 1px solid var(--chinese-gold);
+            border-bottom: 1px solid var(--chinese-gold);
+        }
+        
+        .stats-grid {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 30px;
+            text-align: center;
+        }
+        
+        .stat-item h3 {
+            font-size: 3rem;
+            color: var(--chinese-gold);
+            margin-bottom: 10px;
+            font-family: var(--font-chinese);
+        }
+        
+        .stat-item p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        /* ================= INTERACTIVE DEMO ================= */
+        .demo-section {
+            background: linear-gradient(135deg, #0f1c54, #1a0f3b);
+        }
+        
+        .demo-container {
+            max-width: 700px;
+            margin: 40px auto 0;
+            background: var(--glass-bg);
+            border: 1px solid var(--chinese-gold);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(255, 222, 0, 0.1);
+        }
+        
+        .demo-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .demo-input {
+            flex: 1;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .demo-input:focus {
+            outline: none;
+            border-color: var(--chinese-gold);
+        }
+        
+        .demo-output {
+            min-height: 100px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px dashed var(--glass-border);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .demo-loader {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: var(--chinese-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .demo-result {
+            display: none;
+            font-family: var(--font-chinese);
+            font-size: 1.5rem;
+            color: var(--chinese-gold);
+        }
+        
+        .demo-placeholder {
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        /* ================= PRICING ================= */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+            align-items: stretch;
+        }
+        
+        .pricing-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: 0.4s;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .pricing-card.featured {
+            border-color: var(--chinese-gold);
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 222, 0, 0.2);
+        }
+        
+        .pricing-card h3 { font-size: 1.8rem; margin-bottom: 10px; color: white; }
+        .price { font-size: 2.5rem; font-weight: 800; color: var(--chinese-gold); margin: 15px 0; }
+        .price span { font-size: 1rem; color: var(--text-muted); font-weight: normal; }
+        .price-features { list-style: none; text-align: left; margin: 20px 0; flex-grow: 1; }
+        .price-features li { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); }
+        .price-features li:before { content: '✓ '; color: var(--accent-cyan); font-weight: bold; margin-right: 5px; }
+
+        /* ================= PARTNERS ================= */
+        .partners-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-top: 40px;
+            opacity: 0.7;
+        }
+        
+        .partner-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            border-bottom: 2px solid var(--chinese-gold);
+            padding-bottom: 5px;
+        }
+
+        /* ================= ROADmap ================= */
+        .roadmap-container {
+            margin-top: 60px;
+            position: relative;
+        }
+        
+        .roadmap-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--glass-border);
+            transform: translateX(-50%);
+        }
+        
+        .roadmap-step {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+        
+        .roadmap-step:nth-child(even) { flex-direction: row-reverse; }
+        
+        .roadmap-content {
+            width: 45%;
+            background: var(--glass-bg);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+            text-align: right;
+        }
+        
+        .roadmap-step:nth-child(even) .roadmap-content { text-align: left; }
+        
+        .roadmap-content h3 { color: var(--chinese-gold); margin-bottom: 10px; font-size: 1.2rem;}
+        .roadmap-content p { color: var(--text-muted); font-size: 0.9rem; }
+        
+        .roadmap-dot {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 15px;
+            height: 15px;
+            background: var(--chinese-red);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px var(--chinese-red);
+            z-index: 2;
+        }
+
+        /* ================= MERGED PIPELINE SECTION ================= */
+        .pipeline-container {
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 60px;
+        }
+
+        .pipe-step {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+            width: 180px;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: 0.3s;
+            position: relative;
+        }
+        
+        .pipe-step:hover {
+            border-color: var(--chinese-red);
+            box-shadow: 0 0 15px rgba(222, 41, 16, 0.2);
+        }
+
+        .pipe-step .icon { font-size: 2.5rem; margin-bottom: 10px; display: block; }
+        
+        .pipe-step h3 {
+            font-size: 1rem;
+            color: var(--chinese-gold);
+            margin-bottom: 10px;
+        }
+        
+        .pipe-step p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .pipe-arrow {
+            font-size: 1.5rem;
+            color: var(--chinese-gold);
+            animation: arrowPulse 1.5s infinite;
+            align-self: center;
+        }
+
+        @keyframes arrowPulse {
+            0% { opacity: 0.3; transform: translateX(0); }
+            50% { opacity: 1; transform: translateX(5px); }
+            100% { opacity: 0.3; transform: translateX(0); }
+        }
+
+        /* ================= GALLERY SECTION ================= */
+        .gallery-container {
+            margin-top: 50px;
+            position: relative;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            overflow: hidden;
+            border-radius: 20px;
+            border: 1px solid var(--chinese-gold);
+            box-shadow: 0 0 30px rgba(255, 222, 0, 0.2);
+            background-color: var(--primary-bg);
+            min-height: 400px;
+        }
+        
+        .gallery-slider {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+        
+        .slide {
+            min-width: 100%;
+            height: 400px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            background-color: var(--primary-bg);
+        }
+        
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            padding: 0 10px;
+            z-index: 10;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .nav-btn:hover { background: var(--chinese-red); }
+
+        /* ================= TRANSLATION ================= */
+        .translation-box {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 50px;
+        }
+
+        .lang-card {
+            flex: 1;
+            min-width: 300px;
+            max-width: 450px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid var(--glass-border);
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .lang-card:hover { border-color: var(--chinese-gold); }
+        .lang-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+        
+        .chinese-text {
+            font-family: var(--font-chinese);
+            font-size: 1.3rem;
+            line-height: 1.8;
+            color: var(--chinese-gold);
+            text-shadow: 0 0 10px rgba(255, 222, 0, 0.2);
+        }
+
+        /* ================= TECH STACK ================= */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        /* ================= FAQ ================= */
+        .faq-container {
+            max-width: 800px;
+            margin: 50px auto 0;
+        }
+        
+        .faq-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+        
+        .faq-question {
+            padding: 20px;
+            width: 100%;
+            text-align: left;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .faq-question span {
+            font-size: 1.5rem;
+            color: var(--chinese-gold);
+            transition: 0.3s;
+        }
+        
+        .faq-item.active {
+            border-color: var(--chinese-gold);
+        }
+        
+        .faq-item.active .faq-question span {
+            transform: rotate(45deg);
+        }
+        
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            color: var(--text-muted);
+        }
+        
+        .faq-item.active .faq-answer {
+            padding: 0 20px 20px;
+            max-height: 200px;
+        }
+
+        /* ================= REVIEWS SECTION UPDATED ================= */
+        .reviews {
+            padding: 80px 20px;
+        }
+
+        .review.card {
+            background: linear-gradient(145deg, rgba(17, 12, 58, 0.9), rgba(10, 15, 59, 0.95));
+            border: 1px solid rgba(255, 222, 0, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .review.card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border-color: var(--accent-purple);
+        }
+
+        .review-text {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .review-author {
+            font-weight: 700;
+            color: var(--chinese-gold);
+            font-size: 1rem;
+            margin-top: auto;
+            text-align: right;
+        }
+
+        .review-role {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 5px;
+        }
+        
+        /* ================= TEAM ================= */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            margin-top: 50px;
+        }
+
+        .team-card {
+            text-align: center;
+            background: var(--glass-bg);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            transition: 0.3s;
+        }
+        .team-card:hover {
+            transform: scale(1.03);
+            border-color: var(--chinese-gold);
+        }
+
+        .team-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            border: 4px solid var(--chinese-red);
+            box-shadow: 0 0 20px rgba(222, 41, 16, 0.3);
+            transition: 0.3s;
+        }
+        
+        .team-card:hover .team-photo {
+            border-color: var(--chinese-gold);
+        }
+
+        .role {
+            color: var(--chinese-gold);
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 0.95rem;
+            min-height: 1.5em;
+        }
+        
+        .team-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* ================= FOOTER ================= */
+        footer {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 50px 20px;
+            text-align: center;
+            border-top: 1px solid var(--chinese-gold);
+            position: relative;
+            z-index: 2;
+        }
+        footer p { margin-bottom: 10px; color: var(--text-muted); }
+        footer a { color: var(--chinese-gold); border-bottom: 1px dashed transparent; }
+        footer a:hover { border-bottom: 1px dashed var(--chinese-gold); }
+
+        /* ================= MOBILE OPTIMIZATION ================= */
+        @media (max-width: 768px) {
+            section::before, section::after { display: none; } 
+            .lantern { display: none !important; } 
+            .hero-bg-char { display: none; } 
+            #particles-js { opacity: 0.2; } 
+            .chinese-seal { display: none; } 
+
+            section { 
+                padding: 60px 20px; 
+                border: none;
+            }
+            .container { padding: 0; } 
+
+            h2 { 
+                font-size: 1.8rem; 
+                margin-bottom: 30px;
+                line-height: 1.3;
+            }
+            h2::after { margin-top: 10px; }
+            p { font-size: 0.95rem; }
+
+            .hero { 
+                min-height: auto; 
+                padding: 100px 20px 50px; 
+                justify-content: flex-start;
+            }
+            .hero-title { 
+                font-size: 2rem; 
+                margin-bottom: 15px;
+            }
+            .brand { 
+                font-size: 1.2rem; 
+                margin-top: 5px;
+                margin-bottom: 30px;
+                display: block;
+            }
+            .hero-description { 
+                font-size: 1rem; 
+                padding: 0; 
+                margin-bottom: 40px;
+                min-height: auto;
+            }
+
+            .lang-switch { 
+                top: 15px; 
+                right: 15px; 
+                padding: 8px 14px; 
+                font-size: 0.85rem;
+                z-index: 10001;
+            }
+            
+            .hero-buttons { 
+                flex-direction: column; 
+                width: 100%; 
+                gap: 15px; 
+                margin-bottom: 40px;
+            }
+            .btn { 
+                width: 100%; 
+                padding: 15px 20px; 
+                font-size: 1rem; 
+                min-height: 50px;
+            }
+
+            .qr-container { gap: 20px; }
+            .qr-item { padding: 10px; }
+            .qr-item img { width: 100px; height: 100px; }
+            .qr-label { font-size: 0.85rem; }
+
+            .glossary-tabs { display: none; } 
+            
+            .glossary-select-mobile { 
+                display: block; 
+            }
+
+            .features-grid, 
+            .glossary-grid, 
+            .pricing-grid, 
+            .tech-grid, 
+            .team-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .card, .pricing-card, .team-card, .review.card {
+                padding: 25px;
+                border-radius: 15px;
+            }
+            
+            .card h3 { font-size: 1.2rem; }
+
+            .pipeline-container { 
+                flex-direction: column; 
+                align-items: center;
+                gap: 15px; 
+            }
+            .pipe-arrow { 
+                transform: rotate(90deg); 
+                margin: -5px 0;
+            }
+            .pipe-step { 
+                width: 100%; 
+                min-height: auto; 
+                padding: 20px; 
+            }
+
+            .roadmap-container { margin-top: 40px; }
+            .roadmap-line { left: 10px; }
+            .roadmap-step { justify-content: flex-start; padding-left: 30px; margin-bottom: 30px; }
+            .roadmap-dot { left: 10px; width: 12px; height: 12px; }
+            .roadmap-content { width: 100%; text-align: left; padding: 15px; margin-left: 0; }
+
+            .demo-container { padding: 20px; border-radius: 15px; margin-top: 20px; }
+            .demo-input-group { flex-direction: column; gap: 15px; }
+            .demo-input { width: 100%; }
+
+            .pricing-card.featured { 
+                transform: none; 
+                order: -1; 
+            }
+
+            footer { padding: 40px 20px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="particles-js"></div>
+    <div id="lanterns-container"></div>
+    
+    <!-- Language Switcher -->
+    <button class="lang-switch" onclick="toggleLanguage()">中文</button>
+    
+    <!-- Scroll to Top Button -->
+    <div class="scroll-top" id="scrollTop">⬆</div>
+    
+    <!-- Cookie Banner -->
+    <div id="cookieBanner" class="cookie-banner">
+        <p data-i18n="cookie_text">Мы используем cookies для улучшения работы сайта. Продолжая использовать сайт, вы соглашаетесь с политикой конфиденциальности.</p>
+        <button class="cookie-btn" onclick="acceptCookies()" data-i18n="cookie_btn">Принять</button>
+    </div>
+
+    <!-- HERO SECTION -->
+    <section class="hero visible">
+        <div class="hero-bg-char">龙</div>
+        <div class="chinese-seal">智</div>
+        
+        <div class="container">
+            <h1 class="hero-title">
+                🐉 <span data-i18n="hero_title">Преобразуй русские лекции в китайский конспект</span>
+                <span class="brand">Mindarin.ai</span>
+            </h1>
+            
+            <div class="hero-description">
+                <span id="typewriter-text"></span>
+            </div>
+
+            <div class="hero-buttons">
+                <a href="https://huggingface.co/spaces/daryau777/mindarin.ai" target="_blank" class="btn btn-primary" data-i18n="btn_app">Перейти на веб-приложение</a>
+                <a href="https://t.me/ruschinesetranslatorbot" target="_blank" class="btn btn-secondary" data-i18n="btn_bot">Попробовать Telegram-бот</a>
+            </div>
+
+            <div class="qr-container">
+                <div class="qr-item">
+                    <a href="https://t.me/ruschinesetranslatorbot" target="_blank">
+                        <img src="https://z-cdn-media.chatglm.cn/files/ee32c469-2ba5-4c17-bf58-14ca29715c49.png?auth_key=1874186203-f6cd51c750804b3ba50e51568adfe64e-0-f9ccb9557c11f430f7cafb8bf37a6a10" alt="Telegram Bot QR">
+                    </a>
+                    <span class="qr-label" data-i18n="qr1">1. Telegram-бот</span>
+                </div>
+                <div class="qr-item">
+                    <a href="https://huggingface.co/spaces/daryau777/mindarin.ai" target="_blank">
+                        <img src="https://z-cdn-media.chatglm.cn/files/ab96f8e9-82e5-4083-935c-0e5fd98093b6.png?auth_key=1874186203-ab420578fea94d8e91306bc7bda1aa01-0-be6a85ff633ef8cb2119fb9987859c54" alt="Web App QR">
+                    </a>
+                    <span class="qr-label" data-i18n="qr2">2. Веб-приложение</span>
+                </div>
+            </div>
+        </div>
+        <div id="dragon-lottie" style="position: absolute; bottom: 10%; left: 5%; width: 150px; opacity: 0.8; pointer-events: none;"></div>
+    </section>
+
+    <!-- FEATURES SECTION -->
+    <section class="features">
+        <div class="container">
+            <h2 data-i18n="features_title">Особенности Mindarin.ai</h2>
+            <div class="features-grid">
+                <div class="card">
+                    <h3 data-i18n="f1_h">🎙 Голосовой перевод</h3>
+                    <p data-i18n="f1_p">Веб-приложение для автоматического создания структурированных конспектов на китайском языке. Просто запишите голосовое сообщение на русском, и нейросеть переведет его, оформит в виде аккуратного текста (абзацы и списки) и выделит ключевые термины из глоссария.</p>
+                </div>
+                <div class="card">
+                    <h3 data-i18n="f2_h">📝 Автоконспекты</h3>
+                    <p data-i18n="f2_p">Забудьте о рутине. Наш AI-бот автоматически распознает русскую речь, переводит её на китайский и профессионально структурирует текст, выделяя важные слова жирным шрифтом по вашему глоссарию.</p>
+                </div>
+                <div class="card">
+                    <h3 data-i18n="f3_h">🧠 Умный ИИ-помощник</h3>
+                    <p data-i18n="f3_p">Получайте готовый Word-файл без лишних символов и "мусора". Чистый, отформатированный текст, идеально подходящий для учебы, подготовки к экзаменам или рабочих отчетов.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GLOSSARY SECTION -->
+    <section class="glossary-section">
+        <div class="glossary-container">
+            <div class="glossary-header">
+                <h2 data-i18n="gloss_title">Глоссарий ИИ</h2>
+                <p data-i18n="gloss_desc">Полный словарь терминов с переводом на китайский язык для глубокого погружения в тему.</p>
+            </div>
+
+            <div class="glossary-search">
+                <input type="text" id="glossarySearch" placeholder="Поиск термина..." onkeyup="filterGlossary()">
+            </div>
+
+            <!-- Tabs for Desktop -->
+            <div class="glossary-tabs" id="glossaryTabs">
+                <button class="tab-btn active" onclick="filterCategory('all')" data-i18n="tab_all">Все</button>
+                <button class="tab-btn" onclick="filterCategory('ai')" data-i18n="tab_ai">ИИ и ML</button>
+                <button class="tab-btn" onclick="filterCategory('data')" data-i18n="tab_data">Данные</button>
+                <button class="tab-btn" onclick="filterCategory('hw')" data-i18n="tab_hw">Оборудование</button>
+                <button class="tab-btn" onclick="filterCategory('dev')" data-i18n="tab_dev">Разработка</button>
+                <button class="tab-btn" onclick="filterCategory('models')" data-i18n="tab_models">Модели</button>
+            </div>
+
+            <!-- Select for Mobile -->
+            <select id="glossarySelect" class="glossary-select-mobile" onchange="filterCategory(this.value)">
+                <option value="all" data-i18n="tab_all">Все</option>
+                <option value="ai" data-i18n="tab_ai">ИИ и ML</option>
+                <option value="data" data-i18n="tab_data">Данные</option>
+                <option value="hw" data-i18n="tab_hw">Оборудование</option>
+                <option value="dev" data-i18n="tab_dev">Разработка</option>
+                <option value="models" data-i18n="tab_models">Модели</option>
+            </select>
+
+            <div class="glossary-grid" id="glossaryGrid"></div>
+        </div>
+    </section>
+
+    <!-- STATS SECTION -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h3><span class="counter" data-target="500">0</span>+</h3>
+                    <p data-i18n="stat1">Студентов</p>
+                </div>
+                <div class="stat-item">
+                    <h3><span class="counter" data-target="10000">0</span>+</h3>
+                    <p data-i18n="stat2">Минут переведено</p>
+                </div>
+                <div class="stat-item">
+                    <h3><span class="counter" data-target="95">0</span>%</h3>
+                    <p data-i18n="stat3">Точность перевода</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- INTERACTIVE DEMO SECTION -->
+    <section class="demo-section">
+        <div class="container">
+            <h2 data-i18n="demo_title">Попробуйте прямо сейчас</h2>
+            <div class="demo-container">
+                <div class="demo-input-group">
+                    <input type="text" id="demoInput" class="demo-input" placeholder="Введите текст на русском..." data-i18n-placeholder="demo_placeholder">
+                    <button class="btn btn-primary" onclick="simulateTranslation()" data-i18n="demo_btn">Перевести</button>
+                </div>
+                <div class="demo-output" id="demoOutput">
+                    <span class="demo-placeholder" data-i18n="demo_wait">Здесь появится перевод...</span>
+                    <div class="demo-loader" id="demoLoader"></div>
+                    <div class="demo-result" id="demoResult"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PIPELINE SECTION -->
+    <section class="steps">
+        <div class="container">
+            <h2 data-i18n="pipeline_h">Как это работает (AI Pipeline)</h2>
+            <p class="pipeline-desc" style="max-width: 700px; margin: 0 auto 50px; color: var(--text-muted); text-align: center;" data-i18n="pipeline_desc">
+                Интеллектуальная система обрабатывает лекции преподавателей с помощью технологий искусственного интеллекта, распознавания речи и машинного обучения.
+            </p>
+
+            <div class="pipeline-container">
+                <div class="pipe-step">
+                    <div class="icon">🎤</div>
+                    <h3 data-i18n="p1_h">Lecture Audio</h3>
+                    <p data-i18n="p1_p">Запись лекции преподавателя на русском языке</p>
+                </div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step">
+                    <div class="icon">🧠</div>
+                    <h3 data-i18n="p2_h">Speech Recognition</h3>
+                    <p data-i18n="p2_p">ИИ распознаёт голос преподавателя</p>
+                </div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step">
+                    <div class="icon">🤖</div>
+                    <h3 data-i18n="p3_h">AI Processing</h3>
+                    <p data-i18n="p3_p">Анализ лекции и выделение ключевых знаний</p>
+                </div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step">
+                    <div class="icon">📄</div>
+                    <h3 data-i18n="p4_h">Lecture Summary</h3>
+                    <p data-i18n="p4_p">Автоматическое создание конспекта лекции</p>
+                </div>
+                <div class="pipe-arrow">→</div>
+                <div class="pipe-step">
+                    <div class="icon">🇨🇳</div>
+                    <h3 data-i18n="p5_h">Chinese Translation</h3>
+                    <p data-i18n="p5_p">Перевод конспекта на китайский язык</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- GALLERY SECTION -->
+    <section class="gallery-section">
+        <div class="container">
+            <h2 data-i18n="gallery_title">Галерея интерфейса</h2>
+            <div class="gallery-container">
+                <div class="gallery-slider" id="gallerySlider">
+                    <!-- Updated Images -->
+                    <div class="slide" style="background-image: url('https://z-cdn-media.chatglm.cn/files/2f617d16-9cfc-4f35-9dc8-4a7e1d0fdaa2.png?auth_key=1874358162-4f80236f280f45d6b7f5b195f4ccf6fa-0-3235372b0bc57ae1aa1bf5aee47ca6e2');"></div>
+                    <div class="slide" style="background-image: url('https://z-cdn-media.chatglm.cn/files/a1486636-cdfd-4416-a072-2df825095cae.png?auth_key=1874358162-2f02ec0a10c1477d8173accd11dcb0a5-0-585899613e0ac371e151c1b99e96613d');"></div>
+                </div>
+                <div class="gallery-nav">
+                    <button class="nav-btn" onclick="moveGallery(-1)">❮</button>
+                    <button class="nav-btn" onclick="moveGallery(1)">❯</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- PRICING SECTION -->
+    <section class="pricing-section">
+        <div class="container">
+            <h2 data-i18n="price_title">Тарифы</h2>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3 data-i18n="price1_h">Студент</h3>
+                    <div class="price" data-i18n="price1_price">0 ₽</div>
+                    <ul class="price-features">
+                        <li data-i18n="price1_f1">5 лекций в месяц</li>
+                        <li data-i18n="price1_f2">Текстовый перевод</li>
+                        <li data-i18n="price1_f3">Базовая поддержка</li>
+                    </ul>
+                    <button class="btn btn-secondary" style="width:100%" data-i18n="price_btn_free">Бесплатно</button>
+                </div>
+                
+                <div class="pricing-card featured">
+                    <h3 data-i18n="price2_h">Преподаватель</h3>
+                    <div class="price" data-i18n="price2_price">990 ₽ <span data-i18n="price_month">/мес</span></div>
+                    <ul class="price-features">
+                        <li data-i18n="price2_f1">Безлимитные лекции</li>
+                        <li data-i18n="price2_f2">Голосовой перевод</li>
+                        <li data-i18n="price2_f3">Приоритетная поддержка</li>
+                        <li data-i18n="price2_f4">Экспорт в PDF</li>
+                    </ul>
+                    <button class="btn btn-primary" style="width:100%" data-i18n="price_btn_pro">Выбрать</button>
+                </div>
+                
+                <div class="pricing-card">
+                    <h3 data-i18n="price3_h">ВУЗ</h3>
+                    <div class="price" data-i18n="price_custom">Договорная</div>
+                    <ul class="price-features">
+                        <li data-i18n="price3_f1">Корпоративный доступ</li>
+                        <li data-i18n="price3_f2">Интеграция с LMS</li>
+                        <li data-i18n="price3_f3">Персональный менеджер</li>
+                    </ul>
+                    <button class="btn btn-secondary" style="width:100%" data-i18n="price_btn_ent">Связаться</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- ROADMAP -->
+    <section class="roadmap">
+        <div class="container">
+            <h2 data-i18n="road_title">Роадмап проекта 2026</h2>
+            <div class="roadmap-container">
+                <div class="roadmap-line"></div>
+                
+                <!-- Step 1 -->
+                <div class="roadmap-step">
+                    <div class="roadmap-content">
+                        <h3 data-i18n="road1_h">20 января</h3>
+                        <p data-i18n="road1_p">Идея проекта, обсуждение концепции, возможностей реализации и целевой аудитории.</p>
+                    </div>
+                    <div class="roadmap-dot"></div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="roadmap-step">
+                    <div class="roadmap-content">
+                        <h3 data-i18n="road2_h">1 февраля</h3>
+                        <p data-i18n="road2_p">Начало активной работы: черновой Telegram-бот, логотип, концепция визуального стиля.</p>
+                    </div>
+                    <div class="roadmap-dot"></div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="roadmap-step">
+                    <div class="roadmap-content">
+                        <h3 data-i18n="road3_h">6 марта</h3>
+                        <p data-i18n="road3_p">Окончательная разработка Telegram-бота и веб-приложения; первичное тестирование.</p>
+                    </div>
+                    <div class="roadmap-dot"></div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="roadmap-step">
+                    <div class="roadmap-content">
+                        <h3 data-i18n="road4_h">13 марта</h3>
+                        <p data-i18n="road4_p">Улучшения чат-бота и веб-приложения, добавлена анимация дракона.</p>
+                    </div>
+                    <div class="roadmap-dot"></div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="roadmap-step">
+                    <div class="roadmap-content">
+                        <h3 data-i18n="road5_h">20 марта</h3>
+                        <p data-i18n="road5_p">Подготовка к конференции: речь и презентация.</p>
+                    </div>
+                    <div class="roadmap-dot"></div>
+                </div>
+
+                <!-- Step 6 -->
+                <div class="roadmap-step">
+                    <div class="roadmap-content">
+                        <h3 data-i18n="road6_h">22 марта</h3>
+                        <p data-i18n="road6_p">Финальная версия сайта готова, все функции интегрированы.</p>
+                    </div>
+                    <div class="roadmap-dot"></div>
+                </div>
+
+                <!-- Step 7 -->
+                <div class="roadmap-step">
+                    <div class="roadmap-content">
+                        <h3 data-i18n="road7_h">26 марта</h3>
+                        <p data-i18n="road7_p">Первый показ проекта на конференции «Молодая наука» в Пятигорском государственном университете.</p>
+                    </div>
+                    <div class="roadmap-dot"></div>
+                </div>
+
+                <!-- Step 8 -->
+                <div class="roadmap-step">
+                    <div class="roadmap-content">
+                        <h3 data-i18n="road8_h">27 марта</h3>
+                        <p data-i18n="road8_p">Участие в конкурсе среди сильнейших программистов и специалистов в сфере ИИ; конкуренция с университетами по всей стране.</p>
+                    </div>
+                    <div class="roadmap-dot"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- PARTNERS -->
+    <section class="partners">
+        <div class="container">
+            <h2 data-i18n="partners_title">Нам доверяют</h2>
+            <div class="partners-logos">
+                <div class="partner-name" data-i18n="partner_name">Пятигорский государственный университет</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI TRANSLATION DEMO -->
+    <section class="translation">
+        <div class="container">
+            <h2 data-i18n="trans_title">Перевод лекции с русского на китайский</h2>
+            <div class="translation-box">
+                <div class="lang-card russian">
+                    <h3>🇷🇺 <span data-i18n="trans_ru">Русская лекция</span></h3>
+                    <p data-i18n="trans_ru_text">
+                        Искусственный интеллект анализирует речь преподавателя,
+                        распознаёт слова, выделяет ключевые идеи и формирует
+                        структурированный конспект лекции.
+                    </p>
+                </div>
+                
+                <div class="lang-card chinese">
+                    <h3>🇨🇳 <span data-i18n="trans_cn">中文翻译</span></h3>
+                    <p class="chinese-text">
+                        人工智能分析教师的语音，
+                        识别关键词并自动生成讲座摘要，
+                        然后将内容翻译成中文。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TECH STACK -->
+    <section class="tech-stack">
+        <div class="container">
+            <h2 data-i18n="tech_title">Технологии Mindarin.ai</h2>
+            <p class="tech-desc" style="max-width: 700px; margin: 0 auto 60px; color: var(--text-muted); text-align: center;" data-i18n="tech_desc">
+                Проект объединяет современные технологии искусственного интеллекта,
+                программирования и компьютерного оборудования.
+            </p>
+            <div class="tech-grid">
+                <div class="card">
+                    <h3 data-i18n="tech1_h">🤖 Artificial Intelligence</h3>
+                    <p data-i18n="tech1_p">Алгоритмы искусственного интеллекта анализируют лекции и создают конспекты.</p>
+                </div>
+                <div class="card">
+                    <h3 data-i18n="tech2_h">🧠 Neural Networks</h3>
+                    <p data-i18n="tech2_p">Нейронные сети используются для обработки речи и анализа текста.</p>
+                </div>
+                <div class="card">
+                    <h3 data-i18n="tech3_h">🎤 Speech Recognition</h3>
+                    <p data-i18n="tech3_p">Технологии распознавания речи преобразуют голос преподавателя в текст.</p>
+                </div>
+                <div class="card">
+                    <h3 data-i18n="tech4_h">💻 Programming</h3>
+                    <p data-i18n="tech4_p">Python, JavaScript и современные библиотеки машинного обучения.</p>
+                </div>
+                <div class="card">
+                    <h3 data-i18n="tech5_h">🖥 Computer Hardware</h3>
+                    <p data-i18n="tech5_p">Микрофоны, серверы и вычислительные системы для обработки данных.</p>
+                </div>
+                <div class="card">
+                    <h3 data-i18n="tech6_h">🌐 Natural Language Processing</h3>
+                    <p data-i18n="tech6_p">Обработка естественного языка для анализа и перевода лекций.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FAQ SECTION -->
+    <section class="faq-section">
+        <div class="container">
+            <h2 data-i18n="faq_title">Часто задаваемые вопросы</h2>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <button class="faq-question" data-i18n="faq_q1">Как пользоваться веб-приложением? <span>+</span></button>
+                    <div class="faq-answer" data-i18n="faq_a1">Просто перейдите на сайт, зарегистрируйтесь и нажмите кнопку 'Записать лекцию'. Все остальное сделает ИИ.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" data-i18n="faq_q2">Какие языки поддерживаются? <span>+</span></button>
+                    <div class="faq-answer" data-i18n="faq_a2">На данный момент мы поддерживаем перевод с русского на китайский (путунхуа) и наоборот.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" data-i18n="faq_q3">Это бесплатно? <span>+</span></button>
+                    <div class="faq-answer" data-i18n="faq_a3">Первые 5 лекций бесплатны. Далее доступны различные тарифы для студентов и преподавателей.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- REVIEWS SECTION UPDATED -->
+    <section class="reviews">
+        <div class="container">
+            <h2 data-i18n="rev_title">Отзывы пользователей</h2>
+            <div class="features-grid">
+                <!-- Review 1 -->
+                <div class="review card">
+                    <p class="review-text" data-i18n="rev1_text">«Проект Mindarin.ai выделяется своей оригинальной идеей и реальной полезностью. Возможность автоматически конспектировать лекции и переводить их на китайский язык делает процесс преподавания и подготовки материалов значительно удобнее. Это экономит время, помогает студентам быстрее усваивать информацию и позволяет сосредоточиться на ключевых идеях. Такой подход превращает стандартные лекции в интерактивный и понятный инструмент обучения.»</p>
+                    <div class="review-author" data-i18n="rev1_author">— Тимченко Ольга Викторовна</div>
+                    <div class="review-role" data-i18n="rev1_role">доцент кафедры информационно-коммуникационных технологий, математики и информационной безопасности</div>
+                </div>
+                <!-- Review 2 -->
+                <div class="review card">
+                    <p class="review-text" data-i18n="rev2_text">«Этот сайт решает проблему, с которой сталкиваются китайские студенты в России — трудности понимания речи преподавателей. С помощью записи лекций и алгоритмов ИИ русская речь преподавателя точно преобразуется в китайский язык. Это помогает студентам лучше понимать материал, экономит их время и значительно повышает эффективность обучения.»</p>
+                    <div class="review-author" data-i18n="rev2_author">— Kong Xiaoyu (孔晓宇)</div>
+                    <div class="review-role" data-i18n="rev2_role">Коренной носитель китайского языка<br>Пятигорский государственный университет (皮亚季戈尔斯克国立大学)<br>Специальность: переводчик (翻译专业)</div>
+                </div>
+                <!-- Review 3 -->
+                <div class="review card">
+                    <p class="review-text" data-i18n="rev3_text">«Интересный проект с действительно полезной идеей. Mindarin.ai делает именно то, что нужно многим студентам — превращает лекции в структурированный и понятный конспект с мгновенным переводом на китайский язык.<br><br>Особенно приятно, что ключевые термины выделяются — это удобно при работе с техническими дисциплинами. Интерфейс также производит хорошее впечатление: аккуратный, современный и не выглядит как сырой прототип.<br><br>В целом сервис выглядит перспективно: он продолжает развиваться и совершенствоваться, но уже сейчас представляет собой удобный и практичный инструмент, которым можно уверенно пользоваться.»</p>
+                    <div class="review-author" data-i18n="rev3_author">— Самир У.</div>
+                    <div class="review-role" data-i18n="rev3_role">российский студент, обучавшийся в китайском университете</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TEAM SECTION -->
+    <section class="team">
+        <div class="container">
+            <h2 data-i18n="team_title">Команда проекта</h2>
+            <p style="text-align: center; margin-bottom: 40px; color: var(--text-muted);" data-i18n="team_desc">
+                Мы студенты 2 курса специальности <b>«Интеллектуальные системы в гуманитарной сфере»</b><br>
+                Пятигорского государственного университета.
+            </p>
+            <div class="team-grid">
+                <!-- Daria -->
+                <div class="team-card">
+                    <img src="https://z-cdn-media.chatglm.cn/files/5e4745e9-ff18-40cf-9a74-51b7e2ac42af.png?auth_key=1874186203-f8cf4f28fc6243d1bebeb7a253994173-0-8a2784d32ceef46fb4d27be2846d60c3" alt="Дарья Украинцева" class="team-photo">
+                    <h3 data-i18n="daria_name">Дарья Украинцева</h3>
+                    <span class="role" data-i18n="daria_role">ML Engineer</span>
+                    <p class="team-desc" data-i18n="daria_desc">Отвечает за техническую и программную реализацию проекта. Разработала Telegram-бота и основную функциональность веб-приложения на языке Python в среде Google Colab. Для перевода в системе используется библиотека DeepTranslate, а для обработки и структурирования текстовых данных применяется ультракомпактная языковая модель Qwen-1.5B от Alibaba. Обеспечивает корректную работу алгоритмов и интеграцию языковых технологий в функциональность проекта.</p>
+                </div>
+                <!-- Zakhar UPDATED IMAGE -->
+                <div class="team-card">
+                    <img src="https://z-cdn-media.chatglm.cn/files/f2f71cc4-a776-4040-a0b4-9a06b7f5fdee.png?auth_key=1874189746-fa9182b5489b41e0834f4a79adb4b019-0-6a21afe6f8ec145a455ffd92ecd1ac44" alt="Захар Бурымов" class="team-photo">
+                    <h3 data-i18n="zakhar_name">Захар Бурымов</h3>
+                    <span class="role" data-i18n="zakhar_role">UI Motion Designer</span>
+                    <p class="team-desc" data-i18n="zakhar_desc">Отвечает за визуальную составляющую проекта и развитие его фирменного стиля. Разработал дизайн логотипа и цветовую концепцию, сформировав узнаваемую визуальную идентичность продукта. Участвовал в тестировании веб-приложения, обеспечивая качество и удобство пользовательского интерфейса.</p>
+                </div>
+                <!-- Izabella -->
+                <div class="team-card">
+                    <img src="https://z-cdn-media.chatglm.cn/files/0bcf335b-5aac-46fe-8f3e-3d5fa7dd81b8.png?auth_key=1874186203-3d1937ae444e428f87025ff6c3e31fab-0-f4937f4147ffba026b7464ddd53fe457" alt="Изабелла Пашаева" class="team-photo">
+                    <h3 data-i18n="izabella_name">Изабелла Пашаева</h3>
+                    <span class="role" data-i18n="izabella_role">Web Designer • Founder & Creative Director</span>
+                    <p class="team-desc" data-i18n="izabella_desc">Автор идеи проекта Mindarin.ai и руководитель его креативного направления. Более 10 лет изучает китайский язык и культуру, что стало основой концепции платформы и её смысловой направленности. Разработала сайт проекта на HTML, CSS и JavaScript, создала русско-китайский глоссарий и отвечает за языковую точность контента, проверяя и корректируя переводы. Формирует креативную стратегию проекта и обеспечивает связь между технологической частью и культурным контекстом.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <p>© 2026 Mindarin.ai. <span data-i18n="footer_rights">Все права защищены.</span></p>
+            <p>
+                <span data-i18n="footer_contacts">Контакты</span>: <a href="mailto:info@mindarin.ai">info@mindarin.ai</a> | 
+                <a href="https://t.me/ruschinesetranslatorbot" target="_blank">Telegram</a> |
+                <a href="#">WeChat</a> |
+                <a href="#">Weibo</a>
+            </p>
+            <p data-i18n="footer_desc">Уникальный проект с использованием ИИ для обучения и перевода.</p>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script>
+        // ===== PART 1: CORE SYSTEMS =====
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 60, density: { enable: true, value_area: 800 } },
+                color: { value: "#ffffff" },
+                shape: { type: "circle" },
+                opacity: { value: 0.3, random: true },
+                size: { value: 2, random: true },
+                line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.1, width: 1 },
+                move: { enable: true, speed: 1, direction: "none", random: true, straight: false, out_mode: "out" }
+            },
+            interactivity: { detect_on: "canvas", events: { onhover: { enable: true, mode: "grab" }, resize: true }, modes: { grab: { distance: 140, line_linked: { opacity: 0.5 } } } }
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+        }, { threshold: 0.15 });
+        document.querySelectorAll('section').forEach(section => observer.observe(section));
+
+        if (document.getElementById('dragon-lottie')) {
+            lottie.loadAnimation({ container: document.getElementById('dragon-lottie'), renderer: 'svg', loop: true, autoplay: true, path: 'dragon.json' });
+        }
+
+        const textToTypeRU = "Интеллектуальная система распознавания речи, автоматического создания конспектов и мгновенного перевода";
+        const textToTypeCN = "智能语音识别、自动摘要与即时翻译系统";
+        const typeContainer = document.getElementById('typewriter-text');
+        let charIndex = 0;
+        let currentLang = 'ru';
+        
+        function typeWriter(text) {
+            if (charIndex < text.length) {
+                typeContainer.innerHTML = text.substring(0, charIndex + 1) + '<span class="typewriter-cursor"></span>';
+                charIndex++;
+                setTimeout(() => typeWriter(text), Math.random() * 40 + 30);
+            } else { typeContainer.innerHTML = text + '<span class="typewriter-cursor"></span>'; }
+        }
+        setTimeout(() => typeWriter(textToTypeRU), 800);
+
+        function createLantern() {
+            if (window.innerWidth < 768) return; 
+
+            const lantern = document.createElement('div');
+            lantern.classList.add('lantern');
+            lantern.style.left = Math.random() * window.innerWidth + 'px';
+            lantern.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            lantern.style.opacity = Math.random() * 0.5 + 0.3;
+            lantern.style.transform = `scale(${Math.random() * 0.5 + 0.5})`;
+            document.body.appendChild(lantern);
+            setTimeout(() => { lantern.remove(); }, 20000);
+        }
+        setInterval(createLantern, 2000);
+        for(let i=0; i<5; i++) { setTimeout(createLantern, i * 400); }
+
+        // ===== PART 2: GLOSSARY LOGIC =====
+        const GLOSSARY_DATA = [
+            {ru:"Искусственный интеллект", cn:"人工智能", cat:"ai"}, {ru:"ИИ", cn:"人工智能", cat:"ai"}, {ru:"Нейросеть", cn:"神经网络", cat:"ai"},
+            {ru:"Машинное обучение", cn:"机器学习", cat:"ai"}, {ru:"Глубокое обучение", cn:"深度学习", cat:"ai"}, {ru:"Генеративный ИИ", cn:"生成式人工智能", cat:"ai"},
+            {ru:"LLM", cn:"大语言模型", cat:"ai"}, {ru:"Данные", cn:"数据", cat:"data"}, {ru:"Датасет", cn:"数据集", cat:"data"},
+            {ru:"Токенизация", cn:"词元化", cat:"data"}, {ru:"Эмбеддинг", cn:"嵌入", cat:"data"}, {ru:"Функция потерь", cn:"损失函数", cat:"data"},
+            {ru:"Процессор (CPU)", cn:"中央处理器", cat:"hw"}, {ru:"Видеокарта (GPU)", cn:"显卡", cat:"hw"}, {ru:"Облако", cn:"云", cat:"hw"},
+            {ru:"Python", cn:"Python", cat:"dev"}, {ru:"TensorFlow", cn:"TensorFlow", cat:"dev"}, {ru:"Алгоритм", cn:"算法", cat:"dev"},
+            {ru:"DeepSeek", cn:"深度求索", cat:"models"}, {ru:"ChatGPT", cn:"ChatGPT", cat:"models"}, {ru:"Qwen", cn:"通义千问", cat:"models"},
+            {ru:"Компьютерное зрение", cn:"计算机视觉", cat:"models"}
+        ];
+
+        let activeCategory = 'all';
+        function renderGlossary(data) {
+            const grid = document.getElementById('glossaryGrid');
+            grid.innerHTML = '';
+            if(data.length === 0) { grid.innerHTML = '<div class="no-results">Ничего не найдено</div>'; return; }
+            data.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'glossary-item';
+                const termText = currentLang === 'ru' ? item.ru : item.cn;
+                const transText = currentLang === 'ru' ? item.cn : item.ru;
+                div.innerHTML = `<div class="glossary-term">${termText}</div><div class="glossary-translation">${transText}</div>`;
+                grid.appendChild(div);
+            });
+        }
+
+        function filterCategory(cat) {
+            activeCategory = cat;
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if(btn.getAttribute('onclick').includes(`'${cat}'`)) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            const select = document.getElementById('glossarySelect');
+            if(select) select.value = cat;
+
+            let filtered = cat === 'all' ? GLOSSARY_DATA : GLOSSARY_DATA.filter(i => i.cat === cat);
+            const query = document.getElementById('glossarySearch').value.toLowerCase();
+            if(query) filtered = filtered.filter(i => i.ru.toLowerCase().includes(query) || i.cn.includes(query));
+            renderGlossary(filtered);
+        }
+
+        function filterGlossary() {
+            const query = document.getElementById('glossarySearch').value.toLowerCase();
+            let filtered = activeCategory === 'all' ? [...GLOSSARY_DATA] : GLOSSARY_DATA.filter(i => i.cat === activeCategory);
+            if(query) filtered = filtered.filter(i => i.ru.toLowerCase().includes(query) || i.cn.includes(query));
+            renderGlossary(filtered);
+        }
+        renderGlossary(GLOSSARY_DATA);
+
+        // ===== PART 3: TRANSLATION SYSTEM =====
+        const translations = {
+            ru: {
+                hero_title: "Преобразуй русские лекции в китайский конспект",
+                btn_app: "Перейти на веб-приложение", btn_bot: "Попробовать Telegram-бот",
+                qr1: "1. Telegram-бот", qr2: "2. Веб-приложение",
+                features_title: "Особенности Mindarin.ai",
+                f1_h: "🎙 Голосовой перевод", 
+                f1_p: "Веб-приложение для автоматического создания структурированных конспектов на китайском языке. Просто запишите голосовое сообщение на русском, и нейросеть переведет его, оформит в виде аккуратного текста (абзацы и списки) и выделит ключевые термины из глоссария.",
+                f2_h: "📝 Автоконспекты", 
+                f2_p: "Забудьте о рутине. Наш AI-бот автоматически распознает русскую речь, переводит её на китайский и профессионально структурирует текст, выделяя важные слова жирным шрифтом по вашему глоссарию.",
+                f3_h: "🧠 Умный ИИ-помощник", 
+                f3_p: "Получайте готовый Word-файл без лишних символов и 'мусора'. Чистый, отформатированный текст, идеально подходящий для учебы, подготовки к экзаменам или рабочих отчетов.",
+                gloss_title: "Глоссарий ИИ", gloss_desc: "Полный словарь терминов с переводом на китайский язык.",
+                tab_all: "Все", tab_ai: "ИИ и ML", tab_data: "Данные", tab_hw: "Оборудование", tab_dev: "Разработка", tab_models: "Модели",
+                gloss_search: "Поиск термина...",
+                stat1: "Студентов", stat2: "Минут переведено", stat3: "Точность перевода",
+                demo_title: "Попробуйте прямо сейчас", demo_placeholder: "Введите текст на русском...", demo_btn: "Перевести", demo_wait: "Здесь появится перевод...",
+                pipeline_h: "Как это работает (AI Pipeline)", pipeline_desc: "Интеллектуальная система обрабатывает лекции преподавателей с помощью технологий искусственного интеллекта, распознавания речи и машинного обучения.",
+                p1_h: "Lecture Audio", p1_p: "Запись лекции преподавателя на русском языке",
+                p2_h: "Speech Recognition", p2_p: "ИИ распознаёт голос преподавателя",
+                p3_h: "AI Processing", p3_p: "Анализ лекции и выделение ключевых знаний",
+                p4_h: "Lecture Summary", p4_p: "Автоматическое создание конспекта лекции",
+                p5_h: "Chinese Translation", p5_p: "Перевод конспекта на китайский язык",
+                gallery_title: "Галерея интерфейса",
+                price_title: "Тарифы", 
+                price1_h: "Студент", price1_price: "0 ₽", price_btn_free: "Бесплатно", 
+                price2_h: "Преподаватель", price2_price: "990 ₽", price_btn_pro: "Выбрать", 
+                price3_h: "ВУЗ", price_btn_ent: "Связаться",
+                price1_f1: "5 лекций в месяц", price1_f2: "Текстовый перевод", price1_f3: "Базовая поддержка",
+                price2_f1: "Безлимитные лекции", price2_f2: "Голосовой перевод", price2_f3: "Приоритетная поддержка", price2_f4: "Экспорт в PDF",
+                price3_f1: "Корпоративный доступ", price3_f2: "Интеграция с LMS", price3_f3: "Персональный менеджер",
+                road_title: "Роадмап проекта 2026", 
+                road1_h: "20 января", road1_p: "Идея проекта, обсуждение концепции, возможностей реализации и целевой аудитории.",
+                road2_h: "1 февраля", road2_p: "Начало активной работы: черновой Telegram-бот, логотип, концепция визуального стиля.",
+                road3_h: "6 марта", road3_p: "Окончательная разработка Telegram-бота и веб-приложения; первичное тестирование.",
+                road4_h: "13 марта", road4_p: "Улучшения чат-бота и веб-приложения, добавлена анимация дракона.",
+                road5_h: "20 марта", road5_p: "Подготовка к конференции: речь и презентация.",
+                road6_h: "22 марта", road6_p: "Финальная версия сайта готова, все функции интегрированы.",
+                road7_h: "26 марта", road7_p: "Первый показ проекта на конференции «Молодая наука» в Пятигорском государственном университете.",
+                road8_h: "27 марта", road8_p: "Участие в конкурсе среди сильнейших программистов и специалистов в сфере ИИ; конкуренция с университетами по всей стране.",
+                partners_title: "Нам доверяют", partner_name: "Пятигорский государственный университет",
+                trans_title: "Перевод лекции с русского на китайский", trans_ru: "Русская лекция",
+                tech_title: "Технологии Mindarin.ai", tech_desc: "Проект объединяет современные технологии искусственного интеллекта, программирования и компьютерного оборудования.",
+                tech1_h: "🤖 Artificial Intelligence", tech1_p: "Алгоритмы искусственного интеллекта анализируют лекции и создают конспекты.",
+                tech2_h: "🧠 Neural Networks", tech2_p: "Нейронные сети используются для обработки речи и анализа текста.",
+                tech3_h: "🎤 Speech Recognition", tech3_p: "Технологии распознавания речи преобразуют голос преподавателя в текст.",
+                tech4_h: "💻 Programming", tech4_p: "Python, JavaScript и современные библиотеки машинного обучения.",
+                tech5_h: "🖥 Computer Hardware", tech5_p: "Микрофоны, серверы и вычислительные системы для обработки данных.",
+                tech6_h: "🌐 Natural Language Processing", tech6_p: "Обработка естественного языка для анализа и перевода лекций.",
+                faq_title: "Часто задаваемые вопросы",
+                faq_q1: "Как пользоваться веб-приложением?", faq_a1: "Просто перейдите на сайт, зарегистрируйтесь и нажмите кнопку 'Записать лекцию'. Все остальное сделает ИИ.",
+                faq_q2: "Какие языки поддерживаются?", faq_a2: "На данный момент мы поддерживаем перевод с русского на китайский (путунхуа) и наоборот.",
+                faq_q3: "Это бесплатно?", faq_a3: "Первые 5 лекций бесплатны. Далее доступны различные тарифы для студентов и преподавателей.",
+                rev_title: "Отзывы пользователей",
+                // Review 1
+                rev1_text: "«Проект Mindarin.ai выделяется своей оригинальной идеей и реальной полезностью. Возможность автоматически конспектировать лекции и переводить их на китайский язык делает процесс преподавания и подготовки материалов значительно удобнее. Это экономит время, помогает студентам быстрее усваивать информацию и позволяет сосредоточиться на ключевых идеях. Такой подход превращает стандартные лекции в интерактивный и понятный инструмент обучения.»",
+                rev1_author: "— Тимченко Ольга Викторовна",
+                rev1_role: "доцент кафедры информационно-коммуникационных технологий, математики и информационной безопасности",
+                // Review 2 (Updated with Chinese in brackets and native speaker note)
+                rev2_text: "«Этот сайт решает проблему, с которой сталкиваются китайские студенты в России — трудности понимания речи преподавателей. С помощью записи лекций и алгоритмов ИИ русская речь преподавателя точно преобразуется в китайский язык. Это помогает студентам лучше понимать материал, экономит их время и значительно повышает эффективность обучения.»",
+                rev2_author: "— Kong Xiaoyu (孔晓宇)",
+                rev2_role: "Коренной носитель китайского языка<br>Пятигорский государственный университет (皮亚季戈尔斯克国立大学)<br>Специальность: переводчик (翻译专业)",
+                // Review 3
+                rev3_text: "«Интересный проект с действительно полезной идеей. Mindarin.ai делает именно то, что нужно многим студентам — превращает лекции в структурированный и понятный конспект с мгновенным переводом на китайский язык.<br><br>Особенно приятно, что ключевые термины выделяются — это удобно при работе с техническими дисциплинами. Интерфейс также производит хорошее впечатление: аккуратный, современный и не выглядит как сырой прототип.<br><br>В целом сервис выглядит перспективно: он продолжает развиваться и совершенствоваться, но уже сейчас представляет собой удобный и практичный инструмент, которым можно уверенно пользоваться.»",
+                rev3_author: "— Самир У.",
+                rev3_role: "российский студент, обучавшийся в китайском университете",
+                team_title: "Команда проекта",
+                team_desc: "Мы студенты 2 курса специальности «Интеллектуальные системы в гуманитарной сфере» Пятигорского государственного университета.",
+                daria_name: "Дарья Украинцева", daria_role: "ML Engineer",
+                daria_desc: "Отвечает за техническую и программную реализацию проекта. Разработала Telegram-бота и основную функциональность веб-приложения на языке Python в среде Google Colab. Для перевода в системе используется библиотека DeepTranslate, а для обработки и структурирования текстовых данных применяется ультракомпактная языковая модель Qwen-1.5B от Alibaba. Обеспечивает корректную работу алгоритмов и интеграцию языковых технологий в функциональность проекта.",
+                zakhar_name: "Захар Бурымов", zakhar_role: "UI Motion Designer",
+                zakhar_desc: "Отвечает за визуальную составляющую проекта и развитие его фирменного стиля. Разработал дизайн логотипа и цветовую концепцию, сформировав узнаваемую визуальную идентичность продукта. Участвовал в тестировании веб-приложения, обеспечивая качество и удобство пользовательского интерфейса.",
+                izabella_name: "Изабелла Пашаева", izabella_role: "Web Designer • Founder & Creative Director",
+                izabella_desc: "Автор идеи проекта Mindarin.ai и руководитель его креативного направления. Более 10 лет изучает китайский язык и культуру, что стало основой концепции платформы и её смысловой направленности. Разработала сайт проекта на HTML, CSS и JavaScript, создала русско-китайский глоссарий и отвечает за языковую точность контента, проверяя и корректируя переводы. Формирует креативную стратегию проекта и обеспечивает связь между технологической частью и культурным контекстом.",
+                footer_rights: "Все права защищены.", footer_contacts: "Контакты",
+                footer_desc: "Уникальный проект с использованием ИИ для обучения и перевода.",
+                cookie_text: "Мы используем cookies.", cookie_btn: "Принять",
+                price_month: "/мес", price_custom: "Договорная"
+            },
+            cn: {
+                hero_title: "将俄语讲座转化为中文摘要",
+                btn_app: "前往网络应用", btn_bot: "试用Telegram机器人",
+                qr1: "1. Telegram机器人", qr2: "2. 网络应用",
+                features_title: "Mindarin.ai 特色",
+                f1_h: "🎙 语音翻译", 
+                f1_p: "用于自动生成结构化中文笔记的网络应用程序。只需录制俄语语音消息，神经网络即可翻译、格式化成整洁的文本（段落和列表），并突出显示词汇表中的关键词。",
+                f2_h: "📝 自动摘要", 
+                f2_p: "告别繁琐。我们的AI机器人自动识别俄语语音，将其翻译成中文，并专业地构建文本，根据您的词汇表加粗关键单词。",
+                f3_h: "🧠 智能AI助手", 
+                f3_p: "获得没有多余字符和“噪音”的现成Word文件。干净、格式化的文本，非常适合学习、备考或工作报告。",
+                gloss_title: "AI 术语表", gloss_desc: "中英俄术语对照表，助您深入理解技术概念。",
+                tab_all: "全部", tab_ai: "人工智能", tab_data: "数据", tab_hw: "设备", tab_dev: "开发", tab_models: "模型",
+                gloss_search: "搜索术语...",
+                stat1: "学生", stat2: "翻译分钟数", stat3: "翻译准确率",
+                demo_title: "立即尝试", demo_placeholder: "输入俄语...", demo_btn: "翻译", demo_wait: "翻译将出现在这里...",
+                pipeline_h: "工作原理 (AI流程)", pipeline_desc: "智能系统利用人工智能技术处理教师讲座。",
+                p1_h: "讲座音频", p1_p: "录制俄语讲座",
+                p2_h: "语音识别", p2_p: "AI识别教师语音",
+                p3_h: "AI处理", p3_p: "分析讲座并提取关键知识",
+                p4_h: "讲座摘要", p4_p: "自动生成讲座摘要",
+                p5_h: "中文翻译", p5_p: "将摘要翻译成中文",
+                gallery_title: "界面展示",
+                price_title: "价格方案", 
+                price1_h: "学生", price1_price: "¥ 0", price_btn_free: "免费", 
+                price2_h: "教师", price2_price: "¥ 85", price_btn_pro: "选择", 
+                price3_h: "高校", price_btn_ent: "联系",
+                price1_f1: "每月5节讲座", price1_f2: "文本翻译", price1_f3: "基础支持",
+                price2_f1: "无限讲座", price2_f2: "语音翻译", price2_f3: "优先支持", price2_f4: "导出PDF",
+                price3_f1: "企业访问", price3_f2: "LMS集成", price3_f3: "专属经理",
+                price_custom: "面议",
+                price_month: "/月",
+                road_title: "项目路线图 2026",
+                road1_h: "1月20日", road1_p: "项目构思，讨论概念、实施可能性及目标受众。",
+                road2_h: "2月1日", road2_p: "积极工作开始：Telegram机器人草案、Logo、视觉风格概念。",
+                road3_h: "3月6日", road3_p: "Telegram机器人和网络应用程序最终开发；初步测试。",
+                road4_h: "3月13日", road4_p: "改进聊天机器人和网络应用程序，添加龙动画。",
+                road5_h: "3月20日", road5_p: "会议准备：演讲和演示。",
+                road6_h: "3月22日", road6_p: "网站最终版本准备就绪，所有功能已集成。",
+                road7_h: "3月26日", road7_p: "在五所国立大学“青年科学”会议上首次展示项目。",
+                road8_h: "3月27日", road8_p: "参加最强程序员和AI专家竞赛；与全国各大学竞争。",
+                partners_title: "值得信赖", partner_name: "皮亚季戈尔斯克国立大学",
+                trans_title: "俄语讲座翻译成中文", trans_ru: "俄语讲座",
+                tech_title: "技术栈", tech_desc: "项目结合了现代人工智能、编程和计算机硬件技术。",
+                tech1_h: "🤖 人工智能", tech1_p: "人工智能算法分析讲座并创建摘要。",
+                tech2_h: "🧠 神经网络", tech2_p: "神经网络用于语音处理和文本分析。",
+                tech3_h: "🎤 语音识别", tech3_p: "语音识别技术将教师语音转换为文本。",
+                tech4_h: "💻 编程", tech4_p: "Python、JavaScript和现代机器学习库。",
+                tech5_h: "🖥 硬件", tech5_p: "用于数据处理的麦克风、服务器和计算系统。",
+                tech6_h: "🌐 自然语言处理", tech6_p: "用于分析和翻译讲座的自然语言处理。",
+                faq_title: "常见问题",
+                faq_q1: "如何使用该网络应用程序？", faq_a1: "只需访问网站，注册并点击“录制讲座”按钮。AI 会处理其余的事情。",
+                faq_q2: "支持哪些语言？", faq_a2: "目前我们支持俄语到中文（普通话）的翻译，反之亦然。",
+                faq_q3: "是免费的吗？", faq_a3: "前5节讲座免费。之后为学生和教师提供各种套餐。",
+                rev_title: "用户评价",
+                // Review 1
+                rev1_text: "“Mindarin.ai项目以其独特的创意和实用性脱颖而出。自动记录讲座并翻译成中文的功能使教学和资料准备变得更加便捷。它节省了时间，帮助学生更快地掌握信息，并允许专注于核心思想。这种方法将标准讲座转变为互动且易懂的学习工具。”",
+                rev1_author: "— Timchenko Olga Viktorovna",
+                rev1_role: "信息通信技术、数学与信息安全系副教授",
+                // Review 2 (Original Chinese text)
+                rev2_text: "“这个网站解决了中国留学生在俄罗斯留学听不懂老师说的什么的问题。精确地把课上老师讲的俄语内容通过录音，AI算法，转化为中文。使中国留学生更好地理解老师所讲的俄语内容。节省了中国留学生的很多时间。提高了中国留学生的学习效率。”",
+                rev2_author: "— 孔晓宇",
+                rev2_role: "皮亚季戈尔斯克国立大学<br>翻译专业",
+                // Review 3 (Translated Chinese)
+                rev3_text: "“这是一个有趣且想法确实有用的项目。Mindarin.ai正是许多学生所需要的——将讲座转化为结构清晰、易于理解的笔记，并即时翻译成中文。<br><br>特别令人高兴的是，关键术语会被高亮显示——这在处理技术类学科时非常方便。界面也给人留下了很好的印象：整洁、现代，看起来不像是一个粗糙的原型。<br><br>总体而言，该服务看起来很有前景：它在不断发展和完善，但已经是一个可以放心使用的便捷实用工具。”",
+                rev3_author: "— Samir U.",
+                rev3_role: "曾在中国大学学习的俄罗斯学生",
+                team_title: "项目团队",
+                team_desc: "我们是五所国立大学“人文领域智能系统”专业二年级学生。",
+                daria_name: "Daria Ucrainsteva", daria_role: "机器学习工程师",
+                daria_desc: "负责项目的技术和软件实现。在Google Colab环境中使用Python开发了Telegram机器人和网络应用程序的核心功能。翻译系统使用DeepTranslate库，文本数据的处理和结构化采用阿里巴巴的Qwen-1.5B超紧凑语言模型。确保算法的正确运行以及语言技术与项目功能的集成。",
+                zakhar_name: "Zakhar Burymov", zakhar_role: "UI 动效设计师",
+                zakhar_desc: "负责项目的视觉部分及其品牌风格的发展。设计了标志和色彩概念，形成了产品可识别的视觉标识。参与网络应用程序测试，确保用户界面的质量和便捷性。",
+                izabella_name: "Izabella Pashaeva", izabella_role: "网页设计师 • 创始人兼创意总监",
+                izabella_desc: "Mindarin.ai项目的创意作者及其创意方向负责人。学习汉语和中国文化已超过10年，这成为平台概念及其意义导向的基础。使用HTML、CSS和JavaScript开发了项目网站，创建了俄中术语表，并通过检查和修正翻译来确保内容的语言准确性。制定项目的创意策略，确保技术部分与文化背景之间的联系。",
+                footer_rights: "版权所有。", footer_contacts: "联系方式",
+                footer_desc: "使用AI进行教育和翻译的独特项目。",
+                cookie_text: "我们使用cookies。", cookie_btn: "接受"
+            }
+        };
+
+        function toggleLanguage() {
+            const btn = document.querySelector('.lang-switch');
+            const searchInput = document.getElementById('glossarySearch');
+            
+            if (currentLang === 'ru') {
+                currentLang = 'cn';
+                btn.innerText = "RU";
+                applyTranslation('cn');
+                charIndex = 0;
+                typeWriter(textToTypeCN);
+                searchInput.placeholder = translations.cn.gloss_search;
+            } else {
+                currentLang = 'ru';
+                btn.innerText = "中文";
+                applyTranslation('ru');
+                charIndex = 0;
+                typeWriter(textToTypeRU);
+                searchInput.placeholder = translations.ru.gloss_search;
+            }
+            filterCategory(activeCategory); 
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach((t, i) => { if(i===0) t.classList.add('active'); else t.classList.remove('active'); });
+        }
+
+        function applyTranslation(lang) {
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                // Use innerHTML to support line breaks (<br>) in roles
+                if (translations[lang][key]) el.innerHTML = translations[lang][key];
+            });
+            
+            const options = document.querySelectorAll('#glossarySelect option');
+            options.forEach(opt => {
+                 const key = opt.getAttribute('data-i18n');
+                 if (translations[lang][key]) opt.textContent = translations[lang][key];
+            });
+
+            const input = document.getElementById('demoInput');
+            if(input) input.placeholder = translations[lang].demo_placeholder;
+        }
+        
+        // ===== PART 4: UTILITIES =====
+        const counters = document.querySelectorAll('.counter');
+        const statsObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    counters.forEach(counter => {
+                        const target = +counter.getAttribute('data-target');
+                        const updateCount = () => {
+                            const count = +counter.innerText;
+                            const inc = target / 100;
+                            if(count < target) {
+                                counter.innerText = Math.ceil(count + inc);
+                                setTimeout(updateCount, 20);
+                            } else { counter.innerText = target; }
+                        };
+                        updateCount();
+                    });
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        document.querySelectorAll('.stats-section').forEach(s => statsObserver.observe(s));
+        
+        let currentSlide = 0;
+        const totalSlides = 2;
+        const slider = document.getElementById('gallerySlider');
+        function moveGallery(direction) {
+            currentSlide += direction;
+            if(currentSlide >= totalSlides) currentSlide = 0;
+            if(currentSlide < 0) currentSlide = totalSlides - 1;
+            slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+        }
+        setInterval(() => moveGallery(1), 5000);
+        
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => btn.parentElement.classList.toggle('active'));
+        });
+        
+        const scrollBtn = document.getElementById('scrollTop');
+        window.addEventListener('scroll', () => scrollBtn.classList.toggle('visible', window.scrollY > 500));
+        scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        
+        function simulateTranslation() {
+            const input = document.getElementById('demoInput').value.toLowerCase().trim();
+            const loader = document.getElementById('demoLoader');
+            const result = document.getElementById('demoResult');
+            const placeholder = document.querySelector('.demo-placeholder');
+            if(!input) return;
+            placeholder.style.display = 'none';
+            result.style.display = 'none';
+            loader.style.display = 'block';
+            setTimeout(() => {
+                loader.style.display = 'none';
+                result.style.display = 'block';
+                const dict = {
+                    "привет": "你好 (Nǐ hǎo)", "лекция": "讲座 (Jiǎngzuò)", "данные": "数据 (Shùjù)", 
+                    "алгоритм": "算法 (Suànfǎ)", "нейросеть": "神经网络 (Shénjīng wǎngluò)",
+                    "искусственный интеллект": "人工智能 (Réngōng zhìnéng)"
+                };
+                let found = false;
+                for(let word in dict) { if(input.includes(word)) { result.innerText = dict[word]; found = true; break; } }
+                if(!found) result.innerHTML = `<span style="font-size: 1rem; color: var(--text-muted);">Демо понимает: привет, лекция, данные, алгоритм, ИИ.</span>`;
+            }, 1200);
+        }
+        
+        function checkCookies() {
+            if(!localStorage.getItem('cookiesAccepted')) setTimeout(() => document.getElementById('cookieBanner').classList.add('show'), 2000);
+        }
+        function acceptCookies() {
+            localStorage.setItem('cookiesAccepted', 'true');
+            document.getElementById('cookieBanner').classList.remove('show');
+        }
+        window.onload = checkCookies;
+
+    </script>
+</body>
+</html>
+<style>
+
+</style>
+<script>
+
+</script>
